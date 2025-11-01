@@ -18,7 +18,7 @@ class WPConnect:
         self.url = url
         self.auth:tuple[Optional[str], Optional[str]] = (user, password)
 
-    def subir_imagen(
+    def upload_img(
             self, 
             nombre_imagen: str, 
             path_imagen: Path
