@@ -18,7 +18,12 @@ class WPConnect:
         self.url = url
         self.auth:tuple[Optional[str], Optional[str]] = (user, password)
 
-    def subir_imagen(self, nombre_imagen: str, path_imagen: Path) -> tuple[Optional[str] , Optional[str]]:
+    def subir_imagen(
+            self, 
+            nombre_imagen: str, 
+            path_imagen: Path
+        ) -> tuple[Optional[str] , Optional[str]]:
+        
         headers = {
             "Content-Disposition": f'attachment; filename="{nombre_imagen}"',
             "Content-Type": "image/jpeg",
