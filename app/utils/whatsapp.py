@@ -32,7 +32,7 @@ class BotWhatsApp:
 
     def enviar_mensaje(
             self, 
-            numero:int, 
+            numero:str, 
             mensaje:str,
             delay:int | None = None
         )->dict[str, str]:
@@ -51,11 +51,11 @@ class BotWhatsApp:
         try:
             if not delay:
 
-                res =httpx.post(
+                res = httpx.post(
                         f"{self.url}/message/sendText/{self.instance}",
                         headers=self._headers,
                         json={
-                            "number": str(numero),
+                            "number": numero,
                             "text": mensaje,
                         }
                     )
@@ -64,7 +64,7 @@ class BotWhatsApp:
                     f"{self.url}/message/sendText/{self.instance}",
                     headers=self._headers,
                     json={
-                        "number": str(numero),
+                        "number": numero,
                         "text": mensaje,
                         "delay":delay,
                     }
@@ -85,7 +85,7 @@ class BotWhatsApp:
 
     def enviar_mensaje_con_boton(
             self,
-            numero:int | str,
+            numero:str,
             titulo:str,
             descripcion:str,
             footer:str,
@@ -107,7 +107,7 @@ class BotWhatsApp:
         """
 
         try:
-            httpx.post(
+            res = httpx.post(
                     f"{self.url}/message/sendButtons/{self.instance}",
                     headers=self._headers,
                     json={
@@ -119,15 +119,27 @@ class BotWhatsApp:
                     }
                 )
             
-        except httpx.exceptions.HTTPError as e:
-            print(f"❌ Error al enviar mensaje con botones: {e}")
+            if res.status_code == 201:
+                return {"info": f"mensaje enviado: {res.status_code}"}
+            
+            else:
+                return {
+                    "status": f"El mensaje no fue enviado {res.status_code}",
+                    "message": f"{res.text}"
+                }
+            
+        except httpx.HTTPError as e:
+            return {
+                "error": f"error al enviar la informacion: {e}"
+            } 
 
     def enviar_sticker(
             self,
             numero:int,
             sticker:str,
-            delay:int = 1200
-    )->bool:
+            delay:int | None = None
+    
+    )->dict[str, str]:
         """
         Envía una sticker a un número específico usando Evolution API.
 
@@ -140,27 +152,52 @@ class BotWhatsApp:
             bool: True si se envió correctamente, False en caso de error.
         """
         try:
-            httpx.post(
-                f"{self.url}/message/sendSticker/{self.instance}",
-                headers=self._headers,
-                json={
-                    "number": numero,
-                    "sticker": sticker,
-                    "delay": delay
+            if not delay:
+
+                res = httpx.post(
+                    f"{self.url}/message/sendSticker/{self.instance}",
+                    headers=self._headers,
+                    json={
+                        "number": numero,
+                        "sticker": sticker,
+                        "delay": delay
+                    }
+                )
+            
+            else:
+
+                res = httpx.post(
+                    f"{self.url}/message/sendSticker/{self.instance}",
+                    headers=self._headers,
+                    json={
+                        "number": numero,
+                        "sticker": sticker,
+                    }
+                )
+            
+            if res.status_code == 201:
+                return {"info": f"Sticker enviado: {res.status_code}"}
+            
+            else:
+                return {
+                    "status": f"El sticker no fue enviado {res.status_code}",
+                    "message": f"{res.text}"
                 }
-            )
-        except httpx.exceptions.HTTPError as e:
-            print(f"❌ Error al enviar mensaje con botones: {e}")
+            
+        except httpx.HTTPError as e:
+            return {
+                "error": f"error al enviar la informacion: {e}"
+            } 
         
 
     def enviar_mensaje_foto(
             self,
-            numero:int,
-            mensaje,
-            path_foto:str = None,
-            buffer:BytesIO = None,
-            delay:int = None
-        )->bool:
+            numero:str,
+            mensaje: str,
+            path_foto:str | None = None,
+            buffer:BytesIO | None = None,
+            delay:int | None = None
+        )->dict[str, str]:
         """
         Envía una foto a un número específico usando Evolution API.
 
@@ -173,7 +210,8 @@ class BotWhatsApp:
         Returns:
             bool: True si se envió correctamente, False en caso de error.
         """
-    
+        img:str = ""
+
         if path_foto and buffer:
             raise ValueError("Solo puedes proporcionar 'path_foto' o 'buffer', no ambos.")
     
@@ -181,8 +219,7 @@ class BotWhatsApp:
             raise ValueError("Debes proporcionar al menos 'path_foto' o 'buffer'.")
 
         if buffer:
-            if not isinstance(buffer, BytesIO):
-                raise TypeError("'buffer' debe ser un objeto BytesIO.")
+
             buffer.seek(0)
             img = base64.b64encode(buffer.read()).decode("utf-8")   
             
@@ -194,25 +231,42 @@ class BotWhatsApp:
                 )
 
         try:
-            httpx.post(
-                f"{self.url}/message/sendMedia/{self.instance}",
-                headers=self._headers,
-                json={
-                    "media": img,
-                    "caption": mensaje,
-                    "mediatype": "image",
-                    "number": str(numero),
-                    "mimetype": "image/jpeg",
-                    "delay": delay
-                },
-            )
-            print("Mensaje con imagen enviado")
+            if not delay:
+                res = httpx.post(
+                    f"{self.url}/message/sendMedia/{self.instance}",
+                    headers=self._headers,
+                    json={
+                        "media": img,
+                        "caption": mensaje,
+                        "mediatype": "image",
+                        "number": numero,
+                        "mimetype": "image/jpeg",
+                        "delay": delay
+                    },
+                )
+            else:
+                res = httpx.post(
+                    f"{self.url}/message/sendMedia/{self.instance}",
+                    headers=self._headers,
+                    json={
+                        "media": img,
+                        "caption": mensaje,
+                        "mediatype": "image",
+                        "number": numero,
+                        "mimetype": "image/jpeg",
+                    },
+                )
+            if res.status_code == 201:
+                return {"info": f"Imangen enviado: {res.status_code}."}
             
-            return True
-        
+            else:
+                return {
+                    "status": f"La imagen no fue enviado {res.status_code}.",
+                    "message": f"{res.text}"
+                }
+            
         except httpx.HTTPError as e:
-            
-            print(f"El mensaje no fue enviado: {e}")
-            
-            return False
+            return {
+                "error": f"error al enviar la informacion: {e}"
+            } 
 
