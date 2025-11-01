@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import Literal
 import base64
 import httpx
 
@@ -35,7 +36,7 @@ class BotWhatsApp:
             numero:str, 
             mensaje:str,
             delay:int | None = None
-        )->dict[str, str]:
+        )->dict[Literal["info", "error", "status"], str]:
         """
         Envía un mensaje de texto a un número específico usando Evolution API.
 
@@ -75,7 +76,7 @@ class BotWhatsApp:
             else:
                 return {
                     "status": f"El mensaje no fue enviado {res.status_code}",
-                    "message": f"{res.text}"
+                    "error": f"{res.text}"
                 }
             
         except httpx.HTTPError as e:
@@ -90,7 +91,7 @@ class BotWhatsApp:
             descripcion:str,
             footer:str,
             botones:list[str],
-        )->dict[str, str]:
+        )->dict[Literal["status", "error", "info"], str]:
         """
         Envía un mensaje de texto con botones personalizables a un número específico usando Evolution API.
         >>> Nota: Debes tener WhatsApp Bussines para poder enviar este mensaje.
@@ -125,7 +126,7 @@ class BotWhatsApp:
             else:
                 return {
                     "status": f"El mensaje no fue enviado {res.status_code}",
-                    "message": f"{res.text}"
+                    "error": f"{res.text}"
                 }
             
         except httpx.HTTPError as e:
@@ -139,7 +140,7 @@ class BotWhatsApp:
             sticker:str,
             delay:int | None = None
     
-    )->dict[str, str]:
+    )->dict[Literal["info", "error", "status"], str]:
         """
         Envía una sticker a un número específico usando Evolution API.
 
@@ -181,7 +182,7 @@ class BotWhatsApp:
             else:
                 return {
                     "status": f"El sticker no fue enviado {res.status_code}",
-                    "message": f"{res.text}"
+                    "error": f"{res.text}"
                 }
             
         except httpx.HTTPError as e:
@@ -197,7 +198,7 @@ class BotWhatsApp:
             path_foto:str | None = None,
             buffer:BytesIO | None = None,
             delay:int | None = None
-        )->dict[str, str]:
+        )->dict[Literal["info", "status", "error"], str]:
         """
         Envía una foto a un número específico usando Evolution API.
 
@@ -261,12 +262,11 @@ class BotWhatsApp:
             
             else:
                 return {
-                    "status": f"La imagen no fue enviado {res.status_code}.",
-                    "message": f"{res.text}"
+                    "status": f"La imagen no fue enviada {res.status_code}.",
+                    "error": f"{res.text}"
                 }
             
         except httpx.HTTPError as e:
             return {
                 "error": f"error al enviar la informacion: {e}"
-            } 
-
+            }
