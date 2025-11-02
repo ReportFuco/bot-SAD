@@ -26,7 +26,7 @@ async def obtener_webhook(request: Request):
     if msg_type == "audioMessage":
         transcripcion = ai.transcribe_ai(message)
         
-        if "busca" in message:
+        if "busca" in transcripcion.text and "noticias" in transcripcion.text:
             # Enviar mensaje de vuelta por WhatsApp
             bot.enviar_mensaje(numero=number_user, mensaje=transcripcion.text, delay=1200)
 
@@ -36,7 +36,7 @@ async def obtener_webhook(request: Request):
     elif msg_type == "conversation":
 
         # Flujo del usuario diga la frase clave
-        if "busca" in message:
+        if "busca" in message and "noticias" in message:
             buscador.get_news(bot, number_user)
 
     # Respuesta del envio de mensajes

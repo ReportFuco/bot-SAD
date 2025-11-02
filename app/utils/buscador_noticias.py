@@ -17,9 +17,9 @@ class BuscadorNoticias:
         dia_anterior = (hoy - timedelta(days=4))
 
         params:dict[str, str | int] = {
-            "q": "supermercados",
+            "q": 'supermercados OR retail AND chile',
             "language": "es",
-            "sortBy": "publishedAt",
+            "sortBy": "relevancy",
             "from": dia_anterior.strftime("%Y-%m-%d"),
             "to": hoy.strftime("%Y-%m-%d"),
             "pageSize":20,
@@ -32,14 +32,20 @@ class BuscadorNoticias:
         if res.status_code == 200:
             bot.enviar_mensaje(
                 numero=numero,
-                mensaje=f"Claro, he encontrado {len(data['articles'])} noticias desde {dia_anterior.strftime("%d-%m-%Y")} hasta {hoy.strftime("%d-%m-%Y")}!"
+                mensaje=f"Claro, he encontrado {len(data['articles'])} noticias desde {dia_anterior.strftime('%d-%m-%Y')} hasta {hoy.strftime('%d-%m-%Y')}!"
             )
             for article in data["articles"]:
 
                 bot.enviar_mensaje(
                     numero=numero,
-                    mensaje=f"""Titulo: {article["title"]}\n{article["content"]}\n\n{article["url"]}""",
-                    )
+                    mensaje=f"""
+Titulo: {article["title"]}
+                    
+Fecha: {datetime.strptime(article['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').strftime('%d-%m-%Y')}
+                    
+Contenido: {article["content"]}
+                    
+URL: {article["url"]}""")
         else:
 
             bot.enviar_mensaje(
