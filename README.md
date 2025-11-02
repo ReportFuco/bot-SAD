@@ -65,3 +65,9 @@ graph TD
 | PM2 (opcional)                              | Gestor de procesos                 | Util si el bot o backend se ejecuta fuera de Docker. Permite reinicio automatico ante fallos.                                                      |
 | Logging (loguru / rich)                     | Monitoreo y depuracion             | Librerias Python para registrar logs coloridos y legibles con timestamps.                                                                          |
 | Git + GitHub / GitLab                       | Control de versiones               | Administracion del codigo fuente, historial de cambios y posibles despliegues automatizados.                                                       |
+
+
+## Instrucciones de ejecutado
+
+ - En linux debes darle permisos de ejecución con el comando  `chmod +x update_docker.sh`
+ - luego debes ejecutar el siguiente comando para iniciar el Docker Compose `./update_docker.sh` 

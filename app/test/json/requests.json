@@ -1,0 +1,82 @@
+{
+    "event": "messages.upsert",
+    "instance": "fucobot",
+    "data": {
+        "key": {
+            "remoteJid": "56978086719@s.whatsapp.net",
+            "remoteJidAlt": "2066030284883@lid",
+            "fromMe": false,
+            "id": "3FBD4FC8D8718E3E1F7C",
+            "participant": "",
+            "addressingMode": "pn"
+        },
+        "pushName": "Francisco Arancibia",
+        "status": "DELIVERY_ACK",
+        "message": {
+            "messageContextInfo": {
+                "deviceListMetadata": {
+                    "senderKeyIndexes": [],
+                    "recipientKeyIndexes": [],
+                    "senderKeyHash": {
+                        "0": 140,
+                        "1": 122,
+                        "2": 101,
+                        "3": 178,
+                        "4": 166,
+                        "5": 227,
+                        "6": 70,
+                        "7": 187,
+                        "8": 216,
+                        "9": 60
+                    },
+                    "senderTimestamp": {
+                        "low": 1761054431,
+                        "high": 0,
+                        "unsigned": true
+                    },
+                    "recipientKeyHash": {
+                        "0": 196,
+                        "1": 6,
+                        "2": 76,
+                        "3": 161,
+                        "4": 101,
+                        "5": 173,
+                        "6": 72,
+                        "7": 189,
+                        "8": 3,
+                        "9": 43
+                    },
+                    "recipientTimestamp": {
+                        "low": 1761944319,
+                        "high": 0,
+                        "unsigned": true
+                    }
+                },
+                "deviceListMetadataVersion": 2
+            },
+            "conversation": "hola como estas ??"
+        },
+        "contextInfo": {
+            "mentionedJid": [],
+            "groupMentions": [],
+            "expiration": 0,
+            "ephemeralSettingTimestamp": {
+                "low": 0,
+                "high": 0,
+                "unsigned": false
+            },
+            "disappearingMode": {
+                "initiator": 0
+            }
+        },
+        "messageType": "conversation",
+        "messageTimestamp": 1762103591,
+        "instanceId": "b2d1964f-f45d-4f2d-b611-cfb50bb7d573",
+        "source": "desktop"
+    },
+    "destination": "http://147.93.145.132:8000/webhook/",
+    "date_time": "2025-11-02T14:13:11.597Z",
+    "sender": "56990834238@s.whatsapp.net",
+    "server_url": "http://localhost:8080",
+    "apikey": "B08950B308B0-4D25-925A-6D2D1549A56E"
+}

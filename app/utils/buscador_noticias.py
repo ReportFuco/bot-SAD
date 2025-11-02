@@ -14,26 +14,31 @@ class BuscadorNoticias:
     def get_news(self, bot:BotWhatsApp, numero:str):
         
         hoy = datetime.now(ZoneInfo("America/Santiago"))
-        dia_anterior = (hoy - timedelta(days=4)).strftime("%Y-%m-%d")
+        dia_anterior = (hoy - timedelta(days=4))
 
-        params:dict[str, str] = {
-            "q": "retail supermercados",
+        params:dict[str, str | int] = {
+            "q": "supermercados",
             "language": "es",
             "sortBy": "publishedAt",
-            "from": dia_anterior,
+            "from": dia_anterior.strftime("%Y-%m-%d"),
             "to": hoy.strftime("%Y-%m-%d"),
+            "pageSize":20,
             "apiKey": self.api_key
         }
 
-        res = httpx.get(self.BASE_URL, params=params)
+        res = httpx.get(self.BASE_URL, params=params) 
         data = res.json()
 
         if res.status_code == 200:
+            bot.enviar_mensaje(
+                numero=numero,
+                mensaje=f"Claro, he encontrado {len(data['articles'])} noticias desde {dia_anterior.strftime("%d-%m-%Y")} hasta {hoy.strftime("%d-%m-%Y")}!"
+            )
             for article in data["articles"]:
 
                 bot.enviar_mensaje(
                     numero=numero,
-                    mensaje=f"""Titulo: {article['title']}\n{article['content']}\n\n{article['url']}""",
+                    mensaje=f"""Titulo: {article["title"]}\n{article["content"]}\n\n{article["url"]}""",
                     )
         else:
 

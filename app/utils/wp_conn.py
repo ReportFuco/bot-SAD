@@ -25,7 +25,7 @@ class WPConnect:
         ) -> tuple[Optional[str] , Optional[str]]:
         
         headers = {
-            "Content-Disposition": f'attachment; filename="{nombre_imagen}"',
+            "Content-Disposition": f"attachment; filename="{nombre_imagen}"",
             "Content-Type": "image/jpeg",
         }
 
