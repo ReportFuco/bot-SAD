@@ -1,13 +1,13 @@
-from app.utils.prompts import prompt_classify
+from app.ai import prompts
 from base64 import b64decode
 from openai import OpenAI
-from app.settings import API_KEY
+from app.settings import API_KEY_OPENAI
 import json
 import re
 import io
 
 
-client = OpenAI(api_key=API_KEY)
+client = OpenAI(api_key=API_KEY_OPENAI)
 
 def transcribe_ai(base64:str):
     """
@@ -29,6 +29,19 @@ def transcribe_ai(base64:str):
         file=audio_buffer
     )
 
+
+def search_news()->str:
+    response = client.chat.completions.create(
+        model="gpt-5",
+        messages=[
+            {"role": "system", "content": prompts.prompt_search_news_system},
+            { "role": "user", "content":  prompts.prompt_search_news_user}
+
+        ]
+    )
+    return response.choices[0].message.content or "{}"
+
+
 def classify_message(message: str) -> dict[str, str | float]:
     """
     Funcion para clasificar texto con OpenAI:
@@ -37,7 +50,7 @@ def classify_message(message: str) -> dict[str, str | float]:
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "Eres un clasificador de mensajes de hábitos y entrenamientos."},
-            {"role": "user", "content": prompt_classify.format(message)}
+            {"role": "user", "content": prompts.prompt_classify.format(message)}
         ],
         temperature=0.2,
     )
