@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.news import Noticia, Dominio, UsuarioNoticia, PublicacionWordpress
+from app.models.news import Noticia, UsuarioNoticia, PublicacionWordpress
 from datetime import datetime
 
 
@@ -13,7 +13,6 @@ async def upsert_noticia(db: AsyncSession, noticia_data: dict[str, str | int]):
     noticia = result.scalar_one_or_none()
 
     if noticia:
-        # Actualiza campos si cambia algo
         for key, value in noticia_data.items():
             setattr(noticia, key, value)
     else:
@@ -25,9 +24,6 @@ async def upsert_noticia(db: AsyncSession, noticia_data: dict[str, str | int]):
     return noticia
 
 
-# ----------------------------------------------------------------------
-# 2️⃣ Marcar noticia como vista
-# ----------------------------------------------------------------------
 async def marcar_como_vista(db: AsyncSession, id_usuario: int, id_noticia: int):
     stmt = select(UsuarioNoticia).where(
         UsuarioNoticia.id_usuario == id_usuario,
@@ -45,9 +41,7 @@ async def marcar_como_vista(db: AsyncSession, id_usuario: int, id_noticia: int):
     await db.commit()
     return registro
 
-# ----------------------------------------------------------------------
-# 3️⃣ Noticias no vistas por usuario
-# ----------------------------------------------------------------------
+
 async def get_noticias_no_vistas(db: AsyncSession, id_usuario: int, limit: int = 5):
     """
     Devuelve las noticias no vistas por el usuario.
@@ -67,9 +61,7 @@ async def get_noticias_no_vistas(db: AsyncSession, id_usuario: int, limit: int =
     result = await db.execute(stmt)
     return result.scalars().all()
 
-# ----------------------------------------------------------------------
-# 4️⃣ Registrar publicación en WordPress
-# ----------------------------------------------------------------------
+
 async def registrar_publicacion_wp(db: AsyncSession, id_noticia: int, id_post_wp: int, url: str, publicado: bool):
     publicacion = PublicacionWordpress(
         id_noticia=id_noticia,
