@@ -11,7 +11,7 @@ CREDENCIALS: tuple[str, ...] = tuple((os.getenv("USER_SAD") or "").split(","))
 URL_SAD = os.getenv("URL_SAD") or ""
 
 # Token de OpenAI para manipular Chatgpt entre otros modelos.
-API_KEY_OPENAI = os.getenv("TOKEN_OPENAI")
+API_KEY_OPENAI:str = os.getenv("TOKEN_OPENAI") or ""
 
 # Credenciales de Evolution API
 EVOLUTION_CREDENCIALS: dict[str, str] = {
@@ -20,4 +20,8 @@ EVOLUTION_CREDENCIALS: dict[str, str] = {
     "api_key": os.getenv("API_KEY_EVOLUTION") or ""
 }
 
-API_KEY_NEWSAPI = os.getenv("API_KEY_NEWSAPI") or ""
+# API para conección con NewsAPI, encargado de buscar y encontrar las noticias
+API_KEY_NEWSAPI:str = os.getenv("API_KEY_NEWSAPI") or ""
+
+# Conección con la base de datos
+DATABASE_URL:str = os.getenv("DATABASE_URL") or ""
