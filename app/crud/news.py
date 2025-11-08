@@ -4,26 +4,6 @@ from app.models.news import Noticia, UsuarioNoticia, PublicacionWordpress
 from datetime import datetime
 
 
-async def upsert_noticia(db: AsyncSession, noticia_data: dict[str, str | int]):
-    """
-    Inserta o actualiza una noticia según url_noticia (clave única).
-    """
-    stmt = select(Noticia).where(Noticia.url_noticia == noticia_data["url_noticia"])
-    result = await db.execute(stmt)
-    noticia = result.scalar_one_or_none()
-
-    if noticia:
-        for key, value in noticia_data.items():
-            setattr(noticia, key, value)
-    else:
-        noticia = Noticia(**noticia_data)
-        db.add(noticia)
-
-    await db.commit()
-    await db.refresh(noticia)
-    return noticia
-
-
 async def marcar_como_vista(db: AsyncSession, id_usuario: int, id_noticia: int):
     stmt = select(UsuarioNoticia).where(
         UsuarioNoticia.id_usuario == id_usuario,
