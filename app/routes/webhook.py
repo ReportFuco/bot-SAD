@@ -17,7 +17,7 @@ router = APIRouter(prefix="/webhook", tags=["Webhook"])
 bot = BotWhatsApp(**settings.EVOLUTION_CREDENCIALS)
 buscador = BuscadorNoticias(settings.API_KEY_NEWSAPI)
 
-@router.post("/")
+@router.post("/", include_in_schema=False)
 async def obtener_webhook(request: Request):
     body:dict[str, Any] = await request.json()
     

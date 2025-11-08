@@ -22,3 +22,5 @@ async def crear_noticia(
     db: AsyncSession = Depends(get_db)
 ):
     return await upsert_noticia(db, noticia.model_dump())
+
+

@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import (
     String, Integer, Boolean, DateTime, ForeignKey
 )
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db import Base
 
@@ -13,7 +14,7 @@ class Usuario(Base):
     numero_telefono: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     nombre: Mapped[str] = mapped_column(String(100), nullable=False)
     permiso: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
     noticias_vistas: Mapped[list["UsuarioNoticia"]] = relationship(
         back_populates="usuario", cascade="all, delete-orphan"
@@ -29,7 +30,8 @@ class Noticia(Base):
     url_noticia: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
     url_imagen: Mapped[str] = mapped_column(String(500), nullable=True)
     id_dominio: Mapped[int] = mapped_column(ForeignKey("dominio.id_dominio", ondelete="CASCADE"))
-    fecha_publicacion: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    contenido: Mapped[str] = mapped_column(String, nullable=True)
+    fecha_publicacion: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
     dominio: Mapped["Dominio"] = relationship(back_populates="noticias")
     wordpress: Mapped[list["PublicacionWordpress"]] = relationship(back_populates="noticia", cascade="all, delete-orphan")
@@ -44,7 +46,7 @@ class PublicacionWordpress(Base):
     id_noticia: Mapped[int] = mapped_column(ForeignKey("noticia.id_noticia", ondelete="CASCADE"))
     id_post_wordpress: Mapped[int] = mapped_column(Integer, unique=True)
     publicado: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
     noticia: Mapped["Noticia"] = relationship(back_populates="wordpress")
 

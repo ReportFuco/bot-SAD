@@ -14,10 +14,10 @@ class BuscadorNoticias:
     def get_news(self, bot:BotWhatsApp, numero:str):
         
         hoy = datetime.now(ZoneInfo("America/Santiago"))
-        dia_anterior = (hoy - timedelta(days=4))
+        dia_anterior = (hoy - timedelta(days=1))
 
         params:dict[str, str | int] = {
-            "q": 'supermercados OR retail AND chile',
+            "q": '"supermercados" OR retail',
             "language": "es",
             "sortBy": "relevancy",
             "from": dia_anterior.strftime("%Y-%m-%d"),
