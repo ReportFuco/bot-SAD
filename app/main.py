@@ -1,7 +1,11 @@
 from fastapi import FastAPI
-from app.routes import webhook, news, domains
 from app.settings import PORT, PROTOCOL, URL_SERVER
-
+from app.routes import (
+    webhook, 
+    news, 
+    domains, 
+    users
+)
 
 app = FastAPI(
     title="API de Automatización Supermercados al Día", 
@@ -14,6 +18,7 @@ app = FastAPI(
 app.include_router(webhook.router)
 app.include_router(news.router)
 app.include_router(domains.router)
+app.include_router(users.router)
 
 # Ruta raíz para verificar que la API está funcionando
 @app.get("/")

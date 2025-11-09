@@ -29,7 +29,7 @@ class Noticia(Base):
     descripcion: Mapped[str] = mapped_column(String(500), nullable=True)
     url_noticia: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
     url_imagen: Mapped[str] = mapped_column(String(500), nullable=True)
-    id_dominio: Mapped[int] = mapped_column(ForeignKey("dominio.id_dominio", ondelete="CASCADE"))
+    id_dominio: Mapped[int] = mapped_column(ForeignKey("dominio.id_dominio", ondelete="CASCADE"), nullable=False)
     contenido: Mapped[str] = mapped_column(String, nullable=True)
     fecha_publicacion: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 

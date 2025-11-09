@@ -16,7 +16,18 @@ async def leer_noticias(db: AsyncSession = Depends(get_db)):
     noticias = result.scalars().all()
     return noticias
 
-@router.post("/noticias", response_model=NoticiaResponse)
+
+@router.get("/{noticia_id}", response_model=NoticiaResponse)
+async def leer_noticia(noticia_id: int, db: AsyncSession = Depends(get_db)):
+    stmt = select(Noticia).options(selectinload(Noticia.dominio)).where(Noticia.id_noticia == noticia_id)
+    result = await db.execute(stmt)
+    noticia = result.scalar_one_or_none()
+    if noticia:
+        return noticia
+    raise HTTPException(status_code=404, detail="Noticia no encontrada")
+
+
+@router.post("/create", response_model=NoticiaResponse)
 async def create_noticia(noticia: NoticiaCreate, session: AsyncSession = Depends(get_db)):
 
     existing = await session.execute(
@@ -42,3 +53,13 @@ async def create_noticia(noticia: NoticiaCreate, session: AsyncSession = Depends
     return noticia_con_dominio
 
 
+@router.delete("/{noticia_id}")
+async def eliminar_noticia(noticia_id: int, db: AsyncSession = Depends(get_db)):
+    stmt = select(Noticia).where(Noticia.id_noticia == noticia_id)
+    result = await db.execute(stmt)
+    noticia = result.scalar_one_or_none()
+    if noticia:
+        await db.delete(noticia)
+        await db.commit()
+        return {"message": "Noticia eliminada"}
+    return HTTPException(status_code=404, detail="Noticia no encontrada")
