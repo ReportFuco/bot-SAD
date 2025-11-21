@@ -10,7 +10,7 @@ from app.models.news import Noticia
 router = APIRouter(prefix="/news", tags=["News"])
 
 @router.get("/", response_model=list[NoticiaResponse])
-async def leer_noticias(db: AsyncSession = Depends(get_db)):
+async def obtener_noticias(db: AsyncSession = Depends(get_db)):
     stmt = select(Noticia).options(selectinload(Noticia.dominio))
     result = await db.execute(stmt)
     noticias = result.scalars().all()
@@ -18,7 +18,7 @@ async def leer_noticias(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{noticia_id}", response_model=NoticiaResponse)
-async def leer_noticia(noticia_id: int, db: AsyncSession = Depends(get_db)):
+async def obtener_noticia_id(noticia_id: int, db: AsyncSession = Depends(get_db)):
     stmt = select(Noticia).options(selectinload(Noticia.dominio)).where(Noticia.id_noticia == noticia_id)
     result = await db.execute(stmt)
     noticia = result.scalar_one_or_none()
@@ -28,7 +28,7 @@ async def leer_noticia(noticia_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/create", response_model=NoticiaResponse)
-async def create_noticia(noticia: NoticiaCreate, session: AsyncSession = Depends(get_db)):
+async def crear_noticia(noticia: NoticiaCreate, session: AsyncSession = Depends(get_db)):
 
     existing = await session.execute(
         select(Noticia).where(Noticia.url_noticia == noticia.url_noticia)

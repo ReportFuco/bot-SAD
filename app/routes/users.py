@@ -9,13 +9,13 @@ from sqlalchemy import select
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/")
-async def read_users(db: AsyncSession = Depends(get_db)):
+async def obtener_usuarios(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Usuario))
     users = result.scalars().all()
     return users
 
 @router.get("/{user_id}")
-async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def obtener_usuario_id(user_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Usuario).where(Usuario.id_usuario == user_id))
     user = result.scalar_one_or_none()
     if user:
@@ -23,7 +23,7 @@ async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return HTTPException(status_code=404, detail="Usuario no encontrado")
 
 @router.post("/create")
-async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
+async def crear_usuario(user: UserCreate, db: AsyncSession = Depends(get_db)):
     existing = await db.execute(
         select(Usuario).where(Usuario.numero_telefono == user.numero_telefono)
     )
