@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 
 
-load_dotenv()
+load_dotenv(dotenv_path=".env")
 
 PORT: int = int(os.getenv("PORT") or 8000)
 PROTOCOL: str = os.getenv("PROTOCOL") or "http"
