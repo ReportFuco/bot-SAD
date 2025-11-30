@@ -3,6 +3,7 @@ from app.utils.whatsapp import BotWhatsApp
 from app.utils.buscador_noticias import BuscadorNoticias
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+from app.crud.operations import guardar_noticia
 from app import settings
 from typing import Any
 
@@ -30,8 +31,8 @@ async def obtener_webhook(request: Request):
             # Enviar mensaje de vuelta por WhatsApp
             bot.enviar_mensaje(numero=number_user, mensaje=transcripcion.text, delay=1200)
 
-            buscador.get_news(bot, number_user)
-        
+            dict_noticias = buscador.get_news("publishedAt")
+            
 
     elif msg_type == "conversation":
 
