@@ -1,12 +1,16 @@
 from app.ai import ia_conn as ai
 from app.utils.whatsapp import BotWhatsApp
 from app.utils.buscador_noticias import BuscadorNoticias
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
-from app.crud.operations import guardar_noticia
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.db import get_db
 from app import settings
 from typing import Any
-
+from app.crud.operations import (
+    guardar_noticia,
+    generar_vista_usuario
+)
 from app.utils import (
     prosessing_message as pm, 
     # wp_conn as wp
@@ -18,27 +22,45 @@ router = APIRouter(prefix="/webhook", tags=["Webhook"])
 bot = BotWhatsApp(**settings.EVOLUTION_CREDENCIALS)
 buscador = BuscadorNoticias(settings.API_KEY_NEWSAPI)
 
-@router.post("/", include_in_schema=False)
-async def obtener_webhook(request: Request):
+@router.post("/", include_in_schema=False) 
+async def obtener_webhook(
+    request: Request, 
+    db: AsyncSession = Depends(get_db)
+    ):
+    
     body:dict[str, Any] = await request.json()
     
     number_user, msg_type, message = pm.prosesing_requests(body)
+    texto_final = ""
 
     if msg_type == "audioMessage":
         transcripcion = ai.transcribe_ai(message)
-        
-        if "busca" in transcripcion.text and "noticias" in transcripcion.text:
-            # Enviar mensaje de vuelta por WhatsApp
-            bot.enviar_mensaje(numero=number_user, mensaje=transcripcion.text, delay=1200)
-
-            dict_noticias = buscador.get_news("publishedAt")
-            
+        texto_final = transcripcion.text.lower()
 
     elif msg_type == "conversation":
+        texto_final = message.lower()
 
-        # Flujo del usuario diga la frase clave
-        if "busca" in message and "noticias" in message:
-            buscador.get_news(bot, number_user)
+    if "busca" in texto_final and "noticias" in texto_final:
+        bot.enviar_mensaje(
+            numero=number_user, 
+            mensaje=texto_final, 
+            delay=1200
+        )
+
+        list_dict_noticias = buscador.get_news("publishedAt")
+
+        for dict_noticia in list_dict_noticias:
+            
+            noticia = await guardar_noticia(
+                session=db,
+                data=dict_noticia,
+                dominio_nombre=dict_noticia.dominio
+            )
+
+            if noticia:
+                await generar_vista_usuario(db, number_user, noticia)
+
+        await db.commit()
 
     # Respuesta del envio de mensajes
     return JSONResponse(content={"info": "Mensaje recibido"})

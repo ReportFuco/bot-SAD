@@ -4,12 +4,13 @@ from app.schemas.domains import DomainResponse
 
 class NoticiaBase(BaseModel):
     titulo: str
-    autor: str | None = None
+    autor: str | None
     descripcion: str
     url_noticia: str
-    url_imagen: str | None = None
-    contenido: str | None = None
-    fecha_publicacion: datetime | None = None
+    url_imagen: str | None
+    contenido: str | None
+    dominio: str | None
+    fecha_publicacion: datetime | None
 
 class NoticiaCreate(NoticiaBase):
     id_dominio: int

@@ -89,6 +89,7 @@ class UsuarioNoticia(Base):
     id_usuario: Mapped[int] = mapped_column(ForeignKey("usuario.id_usuario", ondelete="CASCADE"))
     id_noticia: Mapped[int] = mapped_column(ForeignKey("noticia.id_noticia", ondelete="CASCADE"))
     vista: Mapped[bool] = mapped_column(Boolean, default=False)
+    fecha_vista: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
     usuario: Mapped["Usuario"] = relationship(back_populates="noticias_vistas")
     noticia: Mapped["Noticia"] = relationship(back_populates="usuarios_vieron")

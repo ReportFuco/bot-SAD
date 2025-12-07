@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Literal
 import re
-
+from datetime import datetime
+from app.schemas.news import NoticiaBase
 
 class BuscadorNoticias:
 
@@ -16,7 +17,7 @@ class BuscadorNoticias:
             self,
             sort_by:Literal["relevancy", "popularity", "publishedAt"] = "publishedAt",
             q:str = "supermercados OR retail"
-            ) -> list[dict[str, str]] | dict[str, str] | None:
+            ) -> list[NoticiaBase]:
         
         hoy = datetime.now(ZoneInfo("America/Santiago"))
         dia_anterior = (hoy - timedelta(days=1))
@@ -40,17 +41,20 @@ class BuscadorNoticias:
                 r'\b([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+)\b'
             )
 
-            return [{
-                "titulo": noticia["title"],
-                "descripcion": noticia["description"] or "Sin descripción",
-                "url_noticia": noticia["url"],
-                "url_imagen": noticia["urlToImage"] or "",
-                "autor": noticia["author"] or "Desconocido",
-                "dominio": busca_dominio.findall(noticia['url'])[0] if busca_dominio.findall(noticia['url']) else "Desconocido",
-                "fecha_publicacion": datetime.strptime(noticia['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').strftime('%d-%m-%Y')
-            } for noticia in retorno]
+            return [
+                NoticiaBase(
+                    titulo = noticia["title"],
+                    autor = noticia["author"] or "Desconocido",
+                    descripcion = noticia["description"] or "Sin descripción",
+                    url_noticia = noticia["url"],
+                    url_imagen = noticia["urlToImage"] or "",
+                    contenido = noticia["content"] or "",
+                    dominio = busca_dominio.findall(
+                        noticia['url'])[0] if busca_dominio.findall(noticia['url']) else None,
+                    fecha_publicacion = datetime.strptime(
+                        noticia['publishedAt'], '%Y-%m-%dT%H:%M:%SZ'
+                    )
+                ) for noticia in retorno]
 
         else:
-            return {
-                "error": f"No se pudieron obtener las noticias. Código de estado: {res.status_code}"
-            }
+            raise RuntimeError(f"NewsAPI error {res.status_code}: {data}")
