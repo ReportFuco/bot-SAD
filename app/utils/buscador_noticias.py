@@ -35,7 +35,7 @@ class BuscadorNoticias:
             ) -> list[NoticiaBase]:
         
         hoy = datetime.now(ZoneInfo("America/Santiago"))
-        dia_anterior = (hoy - timedelta(days=1))
+        dia_anterior = (hoy - timedelta(days=3))
 
         params:dict[str, str | int] = {
             "q": q,

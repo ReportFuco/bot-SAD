@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 from app.settings import DATABASE_URL
 from app.db import Base
-from app.models.news import *  # importa tus modelos
+from app.models.news import *
 import asyncio
 
 # Alembic config

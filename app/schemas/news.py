@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-
+from app.schemas.domains import DomainResponse
 
 class NoticiaBase(BaseModel):
     titulo: str
@@ -31,6 +31,7 @@ class NoticiaCreate(NoticiaBase):
 
 class NoticiaResponse(NoticiaBase):
     id_noticia: int
+    dominio: DomainResponse | None = None
 
     model_config = {
         "from_attributes": True,

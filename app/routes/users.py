@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.news import Usuario, UsuarioNoticia, Noticia
 from app.schemas.users import UserCreate
+from typing import Any
 from app.db import get_db
 from sqlalchemy import select
 from typing import Any
@@ -10,10 +11,15 @@ from typing import Any
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/")
-async def obtener_usuarios(db: AsyncSession = Depends(get_db)):
+async def obtener_usuarios(db: AsyncSession = Depends(get_db))->list[dict[str, Any]]:
     result = await db.execute(select(Usuario))
     users = result.scalars().all()
-    return users
+    return [{
+        "id": d.id_usuario,
+        "numero": d.numero_telefono,
+        "nombre": d.nombre,
+        "creado": d.created_at.strftime("%d-%m-%Y")
+        } for d in users]
 
 @router.get("/{user_id}")
 async def obtener_usuario_id(user_id: int, db: AsyncSession = Depends(get_db)):

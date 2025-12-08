@@ -3,7 +3,7 @@ from sqlalchemy import select, exists
 from app.schemas.news import NoticiaBase
 from typing import Sequence
 from app.models.news import (
-    Usuario, Noticia, Dominio, UsuarioNoticia
+    Usuario, Noticia, Dominio, UsuarioNoticia, MensajeProcesado
 )
 
 
@@ -40,6 +40,8 @@ async def generar_vista_usuario(db:AsyncSession, telefono: str)-> Sequence[Notic
                 ))
 
             return noticias
+        else:
+            return None
     else: 
         return None
 
@@ -91,3 +93,33 @@ async def guardar_noticia(
     await session.flush()
 
     return noticia
+
+
+async def prosesing_message(db: AsyncSession, message_id: str, numero: str, contenido_msg: str)-> bool:
+    # 1. ¿Mensaje ya procesado?
+    result = await db.execute(
+        select(MensajeProcesado).where(
+            MensajeProcesado.mensaje_id == message_id
+        )
+    )
+    mensaje = result.scalar_one_or_none()
+
+    if mensaje:
+        return False
+
+    # 2. Buscar usuario
+    usuario = await obtener_info_numero(db=db, numero_telefono=numero)
+    if not usuario:
+        return False
+
+    # 3. Guardar nuevo registro
+    nuevo_msg = MensajeProcesado(
+        id_usuario=usuario.id_usuario,
+        mensaje_id=message_id,
+        contenido=contenido_msg
+    )
+
+    db.add(nuevo_msg)
+    await db.flush()
+
+    return True

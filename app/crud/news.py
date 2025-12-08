@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.news import Noticia, UsuarioNoticia, PublicacionWordpress
 from datetime import datetime
+from typing import Any
 
 
 async def marcar_como_vista(db: AsyncSession, id_usuario: int, id_noticia: int):
@@ -21,27 +22,6 @@ async def marcar_como_vista(db: AsyncSession, id_usuario: int, id_noticia: int):
     await db.commit()
     return registro
 
-
-async def get_noticias_no_vistas(db: AsyncSession, id_usuario: int, limit: int = 5):
-    """
-    Devuelve las noticias no vistas por el usuario.
-    """
-    subq = select(UsuarioNoticia.id_noticia).where(
-        UsuarioNoticia.id_usuario == id_usuario,
-        UsuarioNoticia.vista == True
-    )
-
-    stmt = (
-        select(Noticia)
-        .where(Noticia.id_noticia.not_in(subq))
-        .order_by(Noticia.fecha_publicacion.desc())
-        .limit(limit)
-    )
-
-    result = await db.execute(stmt)
-    return result.scalars().all()
-
-
 async def registrar_publicacion_wp(db: AsyncSession, id_noticia: int, id_post_wp: int, url: str, publicado: bool):
     publicacion = PublicacionWordpress(
         id_noticia=id_noticia,
@@ -54,3 +34,23 @@ async def registrar_publicacion_wp(db: AsyncSession, id_noticia: int, id_post_wp
     await db.commit()
     await db.refresh(publicacion)
     return publicacion
+
+
+async def obtener_noticia_id(db: AsyncSession, id_noticia:int)->dict[str, Any] | None:
+    busqueda = await db.execute(select(Noticia).where(
+        Noticia.id_noticia == id_noticia
+    ))
+
+    noticia = busqueda.scalar_one_or_none()
+    if noticia:
+        return {
+            "id": noticia.id_noticia,
+            "titulo": noticia.titulo,
+            "descripcion": noticia.descripcion,
+            "URL": noticia.url_noticia,
+            "imagen": noticia.url_imagen,
+            "contenido": noticia.contenido,
+            "fecha_publicacion": noticia.fecha_publicacion.strftime("%d-%m-%Y"),
+        }
+    else:
+        return None

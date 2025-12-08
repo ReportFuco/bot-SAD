@@ -1,22 +1,27 @@
 from typing import Any, Tuple
 
-def prosesing_requests(body: dict[str, Any]) -> Tuple[str, str, str]:
+def prosesing_requests(body: dict[str, Any]) -> Tuple[str, str, str, str]:
     data: dict[str, Any] = body.get("data", {})
 
-    number:str  = data.get("key", "").get("remoteJid", "")
+    key_data = data.get("key", {})
+
+    number: str = key_data.get("remoteJid", "")
+    msg_id: str = key_data.get("id", "")
 
     if data:
         message_type: str = data.get("messageType", "No encontrado")
+        message_data = data.get("message", {})
 
         if message_type == "conversation":
-            message = data.get("message", {}).get("conversation", "sin mensaje")
-            return (number, message_type, message)
+            message = message_data.get("conversation", "sin mensaje")
+            return (number, message_type, message, msg_id)
 
         elif message_type == "audioMessage":
-            audio_message = data.get("message", {}).get("base64")
-            return (number, message_type, audio_message)
+            audio_message = message_data.get("base64", "")
+            return (number, message_type, audio_message, msg_id)
 
-        return (number, message_type, "Sin mensaje")
-    
+        # Si no es conversation ni audioMessage
+        return (number, message_type, "Sin mensaje", msg_id)
+
     # Caso sin data
-    return ("sin numero", "No data", "Sin mensaje")
+    return ("sin numero", "No data", "Sin mensaje", "Sin ID")
