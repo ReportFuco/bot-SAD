@@ -3,4 +3,3 @@ __pycache__
 .vscode
 env
 assets/image/*
-queries/eliminar informacion.sql

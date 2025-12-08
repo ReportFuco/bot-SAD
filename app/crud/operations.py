@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, exists
-from app.schemas.news import NoticiaBase
+from app.schemas import NoticiaBase
+from app.models import Usuario
 from typing import Sequence
-from app.models.news import (
+from app.models import (
     Usuario, Noticia, Dominio, UsuarioNoticia, MensajeProcesado
 )
 
@@ -14,9 +15,8 @@ async def obtener_info_numero(db: AsyncSession, numero_telefono: str):
     usuario = result.scalar_one_or_none()
     return usuario
 
-async def generar_vista_usuario(db:AsyncSession, telefono: str)-> Sequence[Noticia] | None:
+async def generar_vista_usuario(db:AsyncSession, usuario: Usuario)-> Sequence[Noticia] | None:
 
-    usuario = await obtener_info_numero(db=db,numero_telefono=telefono)
     if usuario:
         subq = (
             select(UsuarioNoticia.id_noticia)
@@ -95,10 +95,10 @@ async def guardar_noticia(
     return noticia
 
 
-async def prosesing_message(
+async def procesar_mensaje(
         db: AsyncSession, 
         message_id: str, 
-        numero: str, 
+        usuario: Usuario, 
         contenido_msg: str,
         tipo_mensaje:str
 )-> bool:
@@ -112,11 +112,6 @@ async def prosesing_message(
     mensaje = result.scalar_one_or_none()
 
     if mensaje:
-        return False
-
-    # 2. Buscar usuario
-    usuario = await obtener_info_numero(db=db, numero_telefono=numero)
-    if not usuario:
         return False
 
     # 3. Guardar nuevo registro

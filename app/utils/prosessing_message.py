@@ -1,12 +1,15 @@
-from typing import Any, Tuple
+from typing import Any
+from app.schemas import ResponseBaseModel
 
-def prosesing_requests(body: dict[str, Any]) -> Tuple[str, str, str, str]:
+
+def procesador_respuestas(body: dict[str, Any]) -> ResponseBaseModel | None:
     data: dict[str, Any] = body.get("data", {})
 
     key_data = data.get("key", {})
 
-    number: str = key_data.get("remoteJid", "")
+    number: str = key_data.get("remoteJid", "").replace("@s.whatsapp.net", "")
     msg_id: str = key_data.get("id", "")
+    push_name = data.get("pushName", None)
 
     if data:
         message_type: str = data.get("messageType", "No encontrado")
@@ -14,14 +17,29 @@ def prosesing_requests(body: dict[str, Any]) -> Tuple[str, str, str, str]:
 
         if message_type == "conversation":
             message = message_data.get("conversation", "sin mensaje")
-            return (number, message_type, message, msg_id)
+            return ResponseBaseModel(
+                numero=number, 
+                tipo_mensaje=message_type, 
+                mensaje_texto=message, 
+                id_mensaje=msg_id,
+                nombre_usuario=push_name
+            )
 
         elif message_type == "audioMessage":
             audio_message = message_data.get("base64", "")
-            return (number, message_type, audio_message, msg_id)
+            return ResponseBaseModel(
+                numero=number, 
+                tipo_mensaje=message_type, 
+                audio_base64=audio_message, 
+                id_mensaje=msg_id,
+                nombre_usuario=push_name
+            )
 
-        # Si no es conversation ni audioMessage
-        return (number, message_type, "Sin mensaje", msg_id)
+        return ResponseBaseModel(
+            numero=number, 
+            tipo_mensaje=message_type, 
+            id_mensaje=msg_id
+        )
 
     # Caso sin data
-    return ("sin numero", "No data", "Sin mensaje", "Sin ID")
+    return None
