@@ -2,9 +2,9 @@ import httpx
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Literal
-import re
 from datetime import datetime
 from app.schemas.news import NoticiaBase
+from urllib.parse import urlparse
 
 class BuscadorNoticias:
 
@@ -12,6 +12,21 @@ class BuscadorNoticias:
     
     def __init__(self, api_key: str) -> None:
         self.api_key = api_key
+
+
+    @staticmethod
+    def extraer_dominio(url: str) -> str:
+        parsed = urlparse(url)
+        host = parsed.netloc.lower()
+
+        if host.startswith("www."):
+            host = host[4:]
+
+        partes = host.split('.')
+        if len(partes) > 2:
+            host = ".".join(partes[-2:])
+        return host
+
 
     def get_news(
             self,
@@ -37,9 +52,6 @@ class BuscadorNoticias:
 
         if res.status_code == 200:
             retorno = data.get("articles", [])
-            busca_dominio = re.compile(
-                r'\b([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+)\b'
-            )
 
             return [
                 NoticiaBase(
@@ -49,8 +61,7 @@ class BuscadorNoticias:
                     url_noticia = noticia["url"],
                     url_imagen = noticia["urlToImage"] or "",
                     contenido = noticia["content"] or "",
-                    dominio = busca_dominio.findall(
-                        noticia['url'])[0] if busca_dominio.findall(noticia['url']) else None,
+                    dominio = self.extraer_dominio(noticia['url']),
                     fecha_publicacion = datetime.strptime(
                         noticia['publishedAt'], '%Y-%m-%dT%H:%M:%SZ'
                     )

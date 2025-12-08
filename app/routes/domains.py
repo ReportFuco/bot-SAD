@@ -5,16 +5,23 @@ from app.db import get_db
 from app.crud.domains import upsert_domain
 from sqlalchemy import select
 from app.models.news import Dominio
-
+from typing import Any
 
 router = APIRouter(prefix="/domains", tags=["Domains"])
 
 @router.get("/")
-async def leer_dominios(db:AsyncSession = Depends(get_db)):
+async def obtener_dominios(db:AsyncSession = Depends(get_db))-> dict[str, Any]:
     stmt = select(Dominio)
     result = await db.execute(stmt)
     dominios = result.scalars().all()
-    return dominios
+    return {
+        "total_dominios": len(dominios),
+        "resultados": [{
+            "id":d.id_dominio,
+            "nombre": d.nombre_dominio,
+            "pais": d.pais
+        } for d in dominios]
+    }
 
 @router.get("/{domain_id}")
 async def leer_dominio(domain_id: int, db: AsyncSession = Depends(get_db)):

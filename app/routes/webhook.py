@@ -26,7 +26,7 @@ buscador = BuscadorNoticias(settings.API_KEY_NEWSAPI)
 async def obtener_webhook(
     request: Request, 
     db: AsyncSession = Depends(get_db)
-    ):
+):
     
     body:dict[str, Any] = await request.json()
     
@@ -41,24 +41,20 @@ async def obtener_webhook(
         texto_final = message.lower()
 
     if "busca" in texto_final and "noticias" in texto_final:
-        bot.enviar_mensaje(
-            numero=number_user, 
-            mensaje=texto_final, 
-            delay=1200
-        )
-
+        bot.enviar_mensaje(numero=number_user, mensaje=f"{body}", delay=1200)
         list_dict_noticias = buscador.get_news("publishedAt")
 
         for dict_noticia in list_dict_noticias:
-            
-            noticia = await guardar_noticia(
-                session=db,
-                data=dict_noticia,
-                dominio_nombre=dict_noticia.dominio
-            )
+            await guardar_noticia(session=db, data=dict_noticia, dominio_nombre=dict_noticia.dominio)
 
-            if noticia:
-                await generar_vista_usuario(db, number_user, noticia)
+        no_vistas = await generar_vista_usuario(db, number_user.replace("@s.whatsapp.net", ""))
+        if no_vistas:
+            for n in no_vistas:
+                bot.enviar_mensaje(
+                    numero=number_user,
+                    mensaje=f"*{n.titulo}*\n{n.descripcion}\n{n.url_noticia}",
+                    delay=1200
+                )
 
         await db.commit()
 

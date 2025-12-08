@@ -15,10 +15,10 @@ app = FastAPI(
     )
 
 # Incluir las rutas del webhook
-app.include_router(webhook.router)
+app.include_router(users.router)
 app.include_router(news.router)
 app.include_router(domains.router)
-app.include_router(users.router)
+app.include_router(webhook.router)
 
 # Ruta raíz para verificar que la API está funcionando
 @app.get("/")

@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, exists
 from app.schemas.news import NoticiaBase
+from typing import Sequence
 from app.models.news import (
     Usuario, Noticia, Dominio, UsuarioNoticia
 )
@@ -13,30 +14,34 @@ async def obtener_info_numero(db: AsyncSession, numero_telefono: str):
     usuario = result.scalar_one_or_none()
     return usuario
 
-async def generar_vista_usuario(
-    db:AsyncSession, 
-    numero_telefono: str, 
-    noticia: Noticia | None
-    ):
+async def generar_vista_usuario(db:AsyncSession, telefono: str)-> Sequence[Noticia] | None:
 
-    usuario = await obtener_info_numero(
-        db=db,
-        numero_telefono=numero_telefono
-    )
-
+    usuario = await obtener_info_numero(db=db,numero_telefono=telefono)
     if usuario:
-        if noticia:
-            vista_usuario = UsuarioNoticia(
-                id_usuario = usuario.id_usuario,
-                id_noticia = noticia.id_noticia,
-                vista = True
+        subq = (
+            select(UsuarioNoticia.id_noticia)
+            .where(
+                UsuarioNoticia.id_usuario == usuario.id_usuario,
+                UsuarioNoticia.id_noticia == Noticia.id_noticia
             )
-            db.add(vista_usuario)
-            await db.flush()
-        else:
-            print("No hay noticias que entregar")
-    else:
-        print("Usuario no encontrado en la base de datos")
+        )
+
+        result = await db.execute(
+            select(Noticia)
+            .where(~exists(subq))
+        )
+        noticias = result.scalars().all()
+        if noticias:
+            for n in noticias:
+                db.add(UsuarioNoticia(
+                    id_usuario=usuario.id_usuario,
+                    id_noticia=n.id_noticia,
+                    vista=True
+                ))
+
+            return noticias
+    else: 
+        return None
 
 async def guardar_noticia(
         session: AsyncSession, 
