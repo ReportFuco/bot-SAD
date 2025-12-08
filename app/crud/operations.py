@@ -95,7 +95,14 @@ async def guardar_noticia(
     return noticia
 
 
-async def prosesing_message(db: AsyncSession, message_id: str, numero: str, contenido_msg: str)-> bool:
+async def prosesing_message(
+        db: AsyncSession, 
+        message_id: str, 
+        numero: str, 
+        contenido_msg: str,
+        tipo_mensaje:str
+)-> bool:
+    
     # 1. ¿Mensaje ya procesado?
     result = await db.execute(
         select(MensajeProcesado).where(
@@ -116,7 +123,8 @@ async def prosesing_message(db: AsyncSession, message_id: str, numero: str, cont
     nuevo_msg = MensajeProcesado(
         id_usuario=usuario.id_usuario,
         mensaje_id=message_id,
-        contenido=contenido_msg
+        contenido=contenido_msg,
+        tipo_mensaje=tipo_mensaje
     )
 
     db.add(nuevo_msg)

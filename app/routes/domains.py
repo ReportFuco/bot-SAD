@@ -32,6 +32,10 @@ async def leer_dominio(domain_id: int, db: AsyncSession = Depends(get_db)):
         return dominio
     raise HTTPException(status_code=404, detail="Dominio no encontrado")
 
+# @router.get("/{domain_id}/noticias")
+# async def leer_noticias_por_dominio(domain_id:int, db:AsyncSession = Depends(get_db)):
+#     consulta = await select()
+
 @router.post("/")
 async def crear_dominio(domain: DomainCreate, db: AsyncSession = Depends(get_db)):
     return await upsert_domain(db, domain.model_dump())

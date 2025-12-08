@@ -50,7 +50,8 @@ async def obtener_webhook(
         db=db, 
         message_id=msg_id, 
         numero=number_user, 
-        contenido_msg=texto_final
+        contenido_msg=texto_final,
+        tipo_mensaje=msg_type
     )
     # Primer comando realizado
     if mensaje_procesado:

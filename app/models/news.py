@@ -102,6 +102,7 @@ class MensajeProcesado(Base):
     id_usuario: Mapped[int] = mapped_column(ForeignKey("usuario.id_usuario", ondelete="CASCADE"))
     mensaje_id: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     contenido: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    tipo_mensaje: Mapped[str] = mapped_column(String(100))
     fecha_creacion: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     
     usuario: Mapped["Usuario"] = relationship()
