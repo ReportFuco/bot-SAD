@@ -64,11 +64,11 @@ async def obtener_webhook(request: Request, db: AsyncSession = Depends(get_db)):
             # 7. detecta si el mensaje tiene las palabras clave
             if "busca" in texto_final and "noticias" in texto_final:
                 bot.enviar_mensaje(numero=evolution.numero, mensaje=f"Hola {usuario.nombre}, buscaré noticias...", delay=1200)
-                noticias = buscador.get_news(sort_by="publishedAt", q="unimarc")
-                noticias_2 = buscador.get_news(sort_by="publishedAt", q="supermercados")
-                noticias_3 = buscador.get_news(sort_by="publishedAt", q="retail")
-                noticias_4 = buscador.get_news(sort_by="publishedAt", q="industria")
-                noticias_5 = buscador.get_news(sort_by="publishedAt", q="mercado internacional")
+                noticias = buscador.get_news(sort_by="publishedAt", q="tiendas AND chile")
+                noticias_2 = buscador.get_news(sort_by="publishedAt", q="supermercados AND chile")
+                noticias_3 = buscador.get_news(sort_by="publishedAt", q="retail AND chile")
+                noticias_4 = buscador.get_news(sort_by="publishedAt", q="industria AND chile")
+                noticias_5 = buscador.get_news(sort_by="publishedAt", q="mercado")
                 list_dict_noticias = noticias + noticias_2 + noticias_3 + noticias_4 + noticias_5
 
                 # 8 Guarda todas las noticias que no se encuentren en la base de datos
