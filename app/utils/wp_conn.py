@@ -25,7 +25,7 @@ class WPConnect:
         ) -> tuple[Optional[str] , Optional[str]]:
         
         headers = {
-            "Content-Disposition": f"attachment; filename="{nombre_imagen}"",
+            "Content-Disposition": f"attachment; filename={nombre_imagen}",
             "Content-Type": "image/jpeg",
         }
 
@@ -85,8 +85,8 @@ class WPConnect:
             self, 
             title:str, 
             content:str, 
+            id_img:str,
             status:str="publish", 
-            id_img:str
         )-> dict[str, str | Any]:
         
         post_data:dict[str, str | Any] = {
